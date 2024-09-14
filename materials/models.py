@@ -1,6 +1,6 @@
 from django.db import models
 
-from users.models import NULLABLE
+NULLABLE = {"blank": True, "null": True}
 
 
 class Course(models.Model):
@@ -51,7 +51,7 @@ class Lesson(models.Model):
         help_text="Укажите ссылку на видео"
     )
     course = models.ForeignKey(
-        Course, on_delete=models.CASCADE, verbose_name="Курс", related_name="course"
+        Course, on_delete=models.CASCADE, verbose_name="Курс", related_name="lesson_count"
     )
 
     class Meta:
