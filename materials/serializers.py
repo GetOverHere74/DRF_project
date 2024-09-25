@@ -19,20 +19,20 @@ class CourseSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class SubscriptionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Subscription
+        fields = '__all__'
+
+
 class CourseDetailSerializer(serializers.ModelSerializer):
     lesson_count = serializers.SerializerMethodField()
     lessons = LessonSerializer(source='lesson_count', many=True, read_only=True)
+    sign_up = SubscriptionSerializer(source='subscription_course', many=True, read_only=True)
 
     def get_lesson_count(self, course):
         return Lesson.objects.filter(course=course).count()
 
     class Meta:
         model = Course
-        fields = ('lessons', 'title', 'description', 'lesson_count', 'image', 'owner',)
-
-
-class SubscriptionSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Subscription
-        fields = ('sign_up',)
-
+        fields = ('lessons', 'title', 'description', 'lesson_count', 'image', 'owner', 'sign_up',)
