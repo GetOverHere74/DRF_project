@@ -144,3 +144,5 @@ SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
 }
+
+STRIPE_API_KEY = 'sk_test_51Q3cBaP43MH7AE0ZUJcqgkqbDGPtcQBvXfHqxOh5XpsmATtDZBvajH1KRJGwapxzYsP2sMRvUl7JQG8wratUhz9E00MeWyP9kX'
