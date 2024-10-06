@@ -1,30 +1,28 @@
 from celery import shared_task
-from django.conf import settings
 from django.core.mail import send_mail
 from datetime import timedelta
 from django.utils import timezone
 
-from materials.models import Course, Subscription
+from config.settings import EMAIL_HOST_USER
+from materials.models import Subscription
 from users.models import User
 
 
 @shared_task
-def update_notification(course_pk):
+def mail_update_course_info(course_id):
     """Отправка сообщения об обновлении курса по подписке"""
-    course = Course.objects.filter(pk=course_pk).first()
-    # print(course)
-    users = User.objects.all()
-    # print(users)
-    for user in users:
-        subscription = Subscription.objects.filter(course=course_pk, user=user.pk).first()
-        # print(subscription)
-        if subscription:
-            send_mail(
-                subject=f'Обновление курса "{course}"',
-                message=f'Курс "{course}", на который вы подписаны, обновлен.',
-                from_email=settings.EMAIL_HOST_USER,
-                recipient_list=[user.email],
-            )
+    subscription_course = Subscription.objects.filter(course=course_id)
+    print(f"Найдено {len(subscription_course)} подписок на курс {course_id}")
+    for subscription in subscription_course:
+        print(f"Отправка электронного письма на {subscription.user.email}")
+        send_mail(
+            subject="Обновление материалов курса",
+            message=f'Курс {subscription.course.title} был обновлен.',
+            from_email=EMAIL_HOST_USER,
+            recipient_list=[subscription.user.email],
+            fail_silently=False
+        )
+
 
 
 @shared_task

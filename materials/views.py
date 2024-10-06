@@ -7,12 +7,13 @@ from rest_framework.generics import CreateAPIView, ListAPIView, RetrieveAPIView,
 from materials.models import Course, Lesson, Subscription
 from materials.paginators import CustomPagination
 from materials.serializers import CourseSerializer, LessonSerializer, CourseDetailSerializer, SubscriptionSerializer
+from materials.tasks import mail_update_course_info
 from users.permissions import IsModerator, IsOwner
-from materials.tasks import update_notification
 
 
 class CourseViewSet(ModelViewSet):
     """ViewSet для управления курсами"""
+
     def get_queryset(self):
         if IsModerator().has_permission(self.request, self):
             return Course.objects.all()
@@ -33,9 +34,9 @@ class CourseViewSet(ModelViewSet):
         course.save()
 
     def perform_update(self, serializer):
-        instance = serializer.save()
-        update_notification.delay(instance.pk)
-        return instance
+        updated_course = serializer.save()
+        mail_update_course_info.delay(updated_course)
+        updated_course.save()
 
     def get_permissions(self):
         if self.action == 'create':
@@ -61,6 +62,7 @@ class LessonCreateAPIView(CreateAPIView):
 
 class LessonListAPIView(ListAPIView):
     """Эндпоинт просмотр уроков"""
+
     def get_queryset(self):
         if IsModerator().has_permission(self.request, self):
             return Lesson.objects.all()
